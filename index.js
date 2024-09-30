@@ -10,9 +10,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
     origin:process.env.FRONTEND_URL || 'http://localhost:5173',
-    credentials:true,
-    secure: true, 
-    sameSite: 'None',
+    credentials:true
 }));
 
 app.use('/auth',authRoutes);

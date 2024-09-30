@@ -14,6 +14,8 @@ export const login = async(req, res) => {
         const {password,...others}=user;
         return res.cookie('token',token,{
             httpOnly:true,
+            secure: true, 
+            sameSite: 'None',
         }).status(200).json(others);
     }
     return res.status(404).json('Something went wrong!')
@@ -32,6 +34,8 @@ export const register = async (req, res) => {
         const {password,...others}=user;
         res.cookie('token',token,{
             httpOnly:true,
+            secure: true, 
+            sameSite: 'None',
         }).status(200).json(others);
     }
 }
