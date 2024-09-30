@@ -7,8 +7,7 @@ export const createPost=async(req,res)=>{
         return res.status(404).json('user not found');
     }
     const post=await postModel.create({userId:user._id,desc:req.body.desc,image:req.file.buffer});
-    console.log(req.file.buffer);
-    return res.status(200).json('post created');
+    return res.status(200).json(post);
 }
 
 export const getPosts=async(req,res)=>{
@@ -16,6 +15,13 @@ export const getPosts=async(req,res)=>{
     if(!user){
         return res.status(404).json('user not found');
     }
-    const post=await postModel.find();
-    return res.status(200).json(post);
+    const posts=await postModel.find();
+    let final=[];
+    posts.forEach((post)=>{
+        const base64Image = Buffer.from(post.image).toString('base64');
+        const {image,...others}=posts;
+        const ans={...others,base64Image};
+        final.push(ans);
+    });
+    return res.status(200).json(final);
 }
