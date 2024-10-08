@@ -87,7 +87,10 @@ export const setProfilePic=async (req,res)=>{
         return res.status(401).json("u can't change others pic")
     }
     if(req.file===undefined || req.file.buffer===undefined){
-        return res.status(401).json('something went wrong')
+        user.profilePic=null;
+        await user.save();
+        const {password,...others}=user.toObject();
+        return res.status(200).json(others);
     }
     user.profilePic=req.file.buffer;
     await user.save();
