@@ -17,18 +17,25 @@ const userSchema=mongoose.Schema({
         type:String,
         required:true
     },
-    post:{
-        type:[mongoose.Schema.ObjectId],
-        default:[]
+    posts:{
+        type:[mongoose.Schema.Types.ObjectId],
+        default:[],
+        ref:'post'
     },
     followers:{
-        type:[mongoose.Schema.ObjectId],
-        default:[]
+        type:[mongoose.Schema.Types.ObjectId],
+        default:[],
+        ref:'user'
+    },
+    profilePic:{
+        type:Buffer,
+        default: null 
     },
     following:{
-        type:[mongoose.Schema.ObjectId],
-        default:[]
-    }
+        type:[mongoose.Schema.Types.ObjectId],
+        default:[],
+        ref:'user'
+    },
 })
 
 const model=mongoose.model('user',userSchema);
