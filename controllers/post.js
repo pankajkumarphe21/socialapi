@@ -9,6 +9,16 @@ export const createPost=async(req,res)=>{
     if(req.file===undefined || req.file.buffer===undefined){
         return res.status(404).json('something went wrong');
     }
+    const allowed=['svg','webp','png','jpg','jpeg'];
+    let flag=0;
+    for(let i=0;i<allowed.length;i++){
+        if(req.file.originalname.split('.')[req.file.originalname.split('.').length-1]==allowed[i]){
+            flag=1;
+        }
+    }
+    if(!flag){
+        return res.status(403).json('file extension should be svg or webp or png or jpg or jpeg ')
+    }
     const post=await postModel.create({userId:user._id,desc:req.body.desc,image:req.file.buffer});
     user.posts.push(post._id);
     await user.save();
