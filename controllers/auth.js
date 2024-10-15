@@ -92,6 +92,16 @@ export const setProfilePic=async (req,res)=>{
         const {password,...others}=user.toObject();
         return res.status(200).json(others);
     }
+    const allowed=['svg','webp','png','jpg','jpeg'];
+    let flag=0;
+    for(let i=0;i<allowed.length;i++){
+        if(req.file.originalname.split('.')[req.file.originalname.split('.').length-1]==allowed[i]){
+            flag=1;
+        }
+    }
+    if(!flag){
+        return res.status(403).json('file extension should be svg or webp or png or jpg or jpeg ')
+    }
     user.profilePic=req.file.buffer;
     await user.save();
     const {password,...others}=user.toObject();
