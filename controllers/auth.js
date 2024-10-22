@@ -107,3 +107,30 @@ export const setProfilePic=async (req,res)=>{
     const {password,...others}=user.toObject();
     return res.status(200).json(others);
 }
+
+export const followUser=async(req,res)=>{
+    const followerId=req.user.userId;
+    const username=req.params.username;
+    const user=await userModel.findOne({username});
+    const otherUser=await userModel.findOne({_id:followerId});
+    const arr=user.followers;
+    const newArr=arr.filter((userId)=>{
+        return userId==followerId;
+    });
+    if(newArr.length===1){
+        user.followers=user.followers.filter((userId)=>{
+            return userId!=followerId;
+        });
+        otherUser.following=otherUser.following.filter((userId)=>{
+            return userId!=user._id.toString();
+        });
+    }
+    else{
+        user.followers.push(otherUser._id);
+        otherUser.following.push(user._id);
+    }
+    await user.save();
+    await otherUser.save();
+    const {password,...others}=otherUser.toObject();
+    return res.status(200).json(others);
+}
