@@ -9,6 +9,7 @@ export const createPost=async(req,res)=>{
     if(req.file===undefined || req.file.buffer===undefined){
         return res.status(404).json('something went wrong');
     }
+    const date=Date.now();
     const allowed=['svg','webp','png','jpg','jpeg'];
     let flag=0;
     for(let i=0;i<allowed.length;i++){
@@ -19,7 +20,7 @@ export const createPost=async(req,res)=>{
     if(!flag){
         return res.status(403).json('file extension should be svg or webp or png or jpg or jpeg ')
     }
-    const post=await postModel.create({userId:user._id,desc:req.body.desc,image:req.file.buffer});
+    const post=await postModel.create({userId:user._id,desc:req.body.desc,image:req.file.buffer,date});
     user.posts.push(post._id);
     await user.save();
     return res.status(200).json(post);
@@ -81,4 +82,16 @@ export const deletePosts=async(req,res)=>{
         console.log(error)
     }
     return res.status(200).json('post deleted');
+}
+
+export const editPost=async(req,res)=>{
+    const post=await postModel.findOne({_id:req.params.postId});
+    if(post.userId!=req.user.userId){
+        return res.status(401).json("can't edit other's post")
+    }
+    try {
+        await postModel.findByIdAndUpdate(post._id,);
+    } catch (error) {
+        console.log(error)
+    }
 }
