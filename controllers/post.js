@@ -31,7 +31,7 @@ export const getPosts=async(req,res)=>{
     if(!user){
         return res.status(404).json('user not found');
     }
-    const posts=await postModel.find({ userId: { $ne: user._id } });
+    const posts=await postModel.find({ userId: { $ne: user._id } }).sort({ date: -1 });
     let final=[];
     posts.forEach((post)=>{
         const base64Image = Buffer.from(post.image).toString('base64');
@@ -50,7 +50,7 @@ export const getUserPosts=async(req,res)=>{
     }
     const username=req.params.userId;
     const getUser=await userModel.findOne({username:username});
-    const posts=await postModel.find({ userId: getUser  });
+    const posts=await postModel.find({ userId: getUser  }).sort({ date: -1 });;
     let final=[];
     posts.forEach((post)=>{
         const base64Image = Buffer.from(post.image).toString('base64');
@@ -90,8 +90,22 @@ export const editPost=async(req,res)=>{
         return res.status(401).json("can't edit other's post")
     }
     try {
-        await postModel.findByIdAndUpdate(post._id,);
+        console.log(req.body.desc)
+        if(req.file===undefined || req.file.buffer===undefined){
+            await postModel.findByIdAndUpdate(post._id,{desc:req.body.desc});
+            await post.save();
+        }
+        else{
+            await postModel.findByIdAndUpdate(post._id,{desc:req.body.desc,image:req.file.buffer});
+            await post.save();
+        }
+        return res.status(200).json('post updated');
     } catch (error) {
         console.log(error)
     }
+}
+
+export const getPost=async(req,res)=>{
+    const post=await postModel.findOne({_id:req.params.postId});
+    return res.status(200).json(post);
 }
