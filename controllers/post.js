@@ -1,5 +1,6 @@
 import postModel from '../models/post.js'
 import userModel from '../models/user.js'
+import mongoose from 'mongoose';
 
 export const createPost=async(req,res)=>{
     const user=await userModel.findOne({_id:req.user.userId});
@@ -90,7 +91,6 @@ export const editPost=async(req,res)=>{
         return res.status(401).json("can't edit other's post")
     }
     try {
-        console.log(req.body.desc)
         if(req.file===undefined || req.file.buffer===undefined){
             await postModel.findByIdAndUpdate(post._id,{desc:req.body.desc});
             await post.save();
@@ -105,7 +105,21 @@ export const editPost=async(req,res)=>{
     }
 }
 
-export const getPost=async(req,res)=>{
-    const post=await postModel.findOne({_id:req.params.postId});
-    return res.status(200).json(post);
-}
+export const getPost = async (req, res) => {
+    const postId = req.params.postId;
+
+    // Validate postId
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+        return res.status(400).json({ error: 'Invalid postId' });
+    }
+
+    try {
+        const post = await postModel.findOne({ _id: postId });
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+        return res.status(200).json(post);
+    } catch (err) {
+        return res.status(500).json({ error: 'Server error', details: err.message });
+    }
+};
