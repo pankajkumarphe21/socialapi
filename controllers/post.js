@@ -123,3 +123,31 @@ export const getPost = async (req, res) => {
         return res.status(500).json({ error: 'Server error', details: err.message });
     }
 };
+
+export const likePost = async (req, res) => {
+    const postId = req.params.postId;
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+        return res.status(400).json({ error: 'Invalid postId' });
+    }
+    try {
+        const post = await postModel.findOne({ _id: postId });
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+        const temp=post.likes.filter((val)=>{
+            return val==req.user.userId;
+        })
+        if(temp.length===1){
+            post.likes=post.likes.filter((val)=>{
+                return val!=req.user.userId;
+            })
+            await post.save();
+            return res.status(200).json(post); 
+        }
+        post.likes.push(req.user.userId);
+        await post.save();
+        return res.status(200).json(post);
+    } catch (err) {
+        return res.status(500).json({ error: 'Server error', details: err.message });
+    }
+};
