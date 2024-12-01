@@ -5,7 +5,7 @@ import mongoose from 'mongoose';
 export const createPost=async(req,res)=>{
     const user=await userModel.findOne({_id:req.user.userId});
     if(!user){
-        return res.status(404).json('user not found');
+        return res.status(404).json('something went wrong');
     }
     if(req.file===undefined || req.file.buffer===undefined){
         return res.status(404).json('something went wrong');
@@ -20,6 +20,9 @@ export const createPost=async(req,res)=>{
     }
     if(!flag){
         return res.status(403).json('file extension should be svg or webp or png or jpg or jpeg ')
+    }
+    if(req.body.desc===''){
+        return res.status(403).json('description is needed')
     }
     const post=await postModel.create({userId:user._id,desc:req.body.desc,image:req.file.buffer,date});
     user.posts.push(post._id);
